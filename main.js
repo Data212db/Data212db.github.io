@@ -76,7 +76,7 @@ loadData().then(() => {
     data: {
       labels: month,
       datasets: [{
-        label: '# of Votes',
+        label: 'Months',
         data: vtr,
         borderWidth: 1
       }]
@@ -173,7 +173,7 @@ loadDataDays(2022, 1).then(() => {
     data: {
       labels: date_diagr,
       datasets: [{
-        label: '# of Votes',
+        label: 'Days',
         data: vtr_diagr,
         borderWidth: 1
       }]
