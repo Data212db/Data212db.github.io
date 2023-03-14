@@ -14,12 +14,12 @@ function sortFunc(a, b){
 
 
 var data_month = [];
-
+var type_date = 'personnel_units';
 
 var date_start = new Date('2022-02-24');
 var today = new Date(Date.now());
 var loop_count = (today.getYear() - date_start.getYear())*12 + (today.getMonth() - date_start.getMonth());
-let chart;
+var chart;
 
 function loadData() {
 return new Promise(function(resolve, reject) {
@@ -64,12 +64,11 @@ loadData().then(() => {
 	for(i = 0; i < data_month.length; i++){
 		month.push(data_month[i].date);
 		if(i == 0){
-			vtr.push(data_month[i].stats.personnel_units)
+			vtr.push(data_month[i].stats[type_date])
 		}else{
-			vtr.push(data_month[i].stats.personnel_units - data_month[i-1].stats.personnel_units)
+			vtr.push(data_month[i].stats[type_date] - data_month[i-1].stats[type_date])
 		}
 	}
-	console.log(month);
 	const ctx = document.getElementById('myChart');
 	chart = new Chart(ctx, {
     type: 'bar',
@@ -193,10 +192,14 @@ loadDataDays(2022, 1).then(() => {
     console.error(error);
   });
 
-
+var index = 0;
 function handleClick(evt)
 {
-	var index = chart.getActiveElements()[0]['index'];
+	index = chart.getActiveElements()[0]['index'];
+	
+	console.log(chart);
+	
+	//chart.getActiveElements()[0].element.options.backgroundColor = '#ff0000';
 	
 	var year_diagram = data_month[index]['date'].slice(0,4);
 	var month_diagram = data_month[index]['date'].slice(5,7);
@@ -219,12 +222,12 @@ function handleClick(evt)
 	for(i = 0; i < data_.length; i++){
 		date_diagr.push(data_[i].date);
 		if(i == 0){
-			vtr_diagr.push(data_[i].stats.personnel_units - prev_data);
+			vtr_diagr.push(data_[i][type_date] - prev_data);
 		}else{
-			if(data_[i].stats.personnel_units - data_[i-1].stats.personnel_units < 0){ 
+			if(data_[i].stats[type_date] - data_[i-1].stats[type_date] < 0){ 
 				vtr_diagr.push(0);
 			} else{
-				vtr_diagr.push(data_[i].stats.personnel_units - data_[i-1].stats.personnel_units);
+				vtr_diagr.push(data_[i].stats[type_date] - data_[i-1].stats[type_date]);
 			}
 		}
 	}
@@ -233,8 +236,68 @@ function handleClick(evt)
 	chart2.config.data.labels = date_diagr;
 	chart2.data.datasets[0]['data'] = vtr_diagr;
 	chart2.update();
+	
+	
   })
   .catch((error) => {
     console.error(error);
   });
 }
+document.getElementsByClassName('image_block')[0].style.backgroundColor = '#ffffff61';
+function changeDataSet(date_type, tag){
+	image_blocks = document.getElementsByClassName('image_block');
+	for(var i = 0; i < image_blocks.length; i++){
+		image_blocks[i].style.backgroundColor = '';
+	}
+	tag.style.backgroundColor = '#ffffff61';
+	type_date = date_type;
+	
+	data_month.sort((a,b) => b.day - a.day).reverse()
+	var month = [];
+	var vtr = [];
+	for(i = 0; i < data_month.length; i++){
+		month.push(data_month[i].date);
+		if(i == 0){
+			vtr.push(data_month[i].stats[type_date])
+		}else{
+			vtr.push(data_month[i].stats[type_date] - data_month[i-1].stats[type_date])
+		}
+	}
+	
+	
+	chart.config.data.labels = month;
+	chart.data.datasets[0]['data'] = vtr;
+	chart.update();
+	
+	
+	loadDataDays(year_date, month_date).then(() => {
+	data_.sort((a,b) => b.day - a.day).reverse();
+	var date_diagr = [];
+	var vtr_diagr = [];
+	
+	if(year_date != 2022 || month_date != 1){
+		prev_data = data_month[index-1].stats.personnel_units;
+		console.log(prev_data);
+	}
+	
+	for(i = 0; i < data_.length; i++){
+		date_diagr.push(data_[i].date);
+		if(i == 0){
+			vtr_diagr.push(data_[i][type_date] - prev_data);
+		}else{
+			if(data_[i].stats[type_date] - data_[i-1].stats[type_date] < 0){ 
+				vtr_diagr.push(0);
+			} else{
+				vtr_diagr.push(data_[i].stats[type_date] - data_[i-1].stats[type_date]);
+			}
+		}
+	}
+	console.log(date_diagr);
+	
+	chart2.config.data.labels = date_diagr;
+	chart2.data.datasets[0]['data'] = vtr_diagr;
+	chart2.update();
+	})
+}
+
+

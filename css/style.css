@@ -5,3 +5,11 @@ body{
 	margin-right: 0;
 	height: 400px;
 }
+.image_button{
+	width: 70%;
+}
+
+
+.image_block:hover{
+	background-color: #ffffff61;
+}
