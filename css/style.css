@@ -13,3 +13,7 @@ body{
 .image_block:hover{
 	background-color: #ffffff61;
 }
+
+.cur_month{
+	color: white;
+}

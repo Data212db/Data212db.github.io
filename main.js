@@ -2,6 +2,8 @@ Date.prototype.daysInMonth = function() {
   return 33 - new Date(this.getFullYear(), this.getMonth(), 33).getDate();
 };
 
+
+
 function sortFunc(a, b){
 	if(a.day > b.day){
 		return 1;
@@ -20,6 +22,8 @@ var date_start = new Date('2022-02-24');
 var today = new Date(Date.now());
 var loop_count = (today.getYear() - date_start.getYear())*12 + (today.getMonth() - date_start.getMonth());
 var chart;
+document.getElementById('defence_days').innerHTML = '' + Math.floor((today - date_start) / (1000 * 60 * 60 * 24)) + ' днів';
+console.log(Math.floor((today - date_start) / (1000 * 60 * 60 * 24)));
 
 function loadData() {
 return new Promise(function(resolve, reject) {
@@ -69,6 +73,14 @@ loadData().then(() => {
 			vtr.push(data_month[i].stats[type_date] - data_month[i-1].stats[type_date])
 		}
 	}
+	var data_all = vtr.reduce(function(sum, elem) {
+	return sum + elem;
+	}, 0);
+	
+	var vtr_percent = vtr.map((num) => (num / data_all)*100);
+	
+	document.getElementById("cur_month_struck").innerHTML = "Struck: "+ vtr[vtr.length - 1];
+	
 	const ctx = document.getElementById('myChart');
 	chart = new Chart(ctx, {
     type: 'bar',
@@ -77,18 +89,31 @@ loadData().then(() => {
       datasets: [{
         label: 'Months',
         data: vtr,
-        borderWidth: 1
+        borderWidth: 1,
+		type: 'bar',
+		yAxisID: 'y',
+      },
+	  {
+        label: 'Percent',
+        data: vtr_percent,
+        borderWidth: 1,
+		type: 'line',
+		yAxisID: 'percentage',
       }]
     },
     options: {
       scales: {
         y: {
-          beginAtZero: true
-        }
+          beginAtZero: true,
+		  position: 'left'
+        },
+		percentage:{
+			beginAtZero: true,
+			position: 'right'
+		}
       },
 	  onClick: handleClick
-    }
-	
+    }	
   });
   })
   .catch((error) => {
@@ -264,8 +289,15 @@ function changeDataSet(date_type, tag){
 		}
 	}
 	
+	var data_all = vtr.reduce(function(sum, elem) {
+	return sum + elem;
+	}, 0);
 	
+	var vtr_percent = vtr.map((num) => (num / data_all)*100);
+	
+	document.getElementById("cur_month_struck").innerHTML = "Struck: "+ vtr[vtr.length - 1];
 	chart.config.data.labels = month;
+	chart.data.datasets[1]['data'] = vtr_percent;
 	chart.data.datasets[0]['data'] = vtr;
 	chart.update();
 	
@@ -292,6 +324,7 @@ function changeDataSet(date_type, tag){
 			}
 		}
 	}
+	
 	console.log(date_diagr);
 	
 	chart2.config.data.labels = date_diagr;
